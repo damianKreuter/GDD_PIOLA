@@ -51,6 +51,9 @@ PRINT 'Esquema Creado ...';
 
 PRINT 'Eliminando Tablas ...';
 
+--18
+	IF OBJECT_ID('Recaptchat.RESERVA_X_CLIENTE') IS NOT NULL
+	DROP TABLE Recaptchat.RESERVA_X_CLIENTE;
 
 --17
 	IF OBJECT_ID('Recaptchat.ITEM_FACTURA') IS NOT NULL
@@ -256,7 +259,7 @@ PRINT 'Creando Tablas ...';
 --13
 	CREATE TABLE Recaptchat.RESERVA (
 	rese_codigo             NUMERIC(18,0) NOT NULL,---- [PK]
-	rese_clie_codigo        INT , -- [FK] Ref a CLIENTE.clie_codigo
+--	rese_clie_codigo        INT , -- [FK] Ref a CLIENTE.clie_codigo
 	rese_habi_codigo	    INT , -- [FK] Ref a HABITACION.habi_codigo
 	rese_regi_codigo        INT , -- [FK] Ref a REGIMEN_ESTADIA.regi_codigo
 	rese_fecha_reserva      DATETIME,
@@ -299,6 +302,12 @@ PRINT 'Creando Tablas ...';
 	item_cons_cantidad     NUMERIC(18,0),
 	item_descripcion	   NVARCHAR(255),
 	item_monto             NUMERIC(18,0)
+	);
+
+--18
+	CREATE TABLE Recaptchat.RESERVA_X_CLIENTE (
+	resxcl_cliente			INT, --[FK] Ref a CLIENTE.clie_codigo
+	resxcl_reserva			INT, --[FK] Ref a RESERVA.rese_codigo
 	);
 
 PRINT 'Tablas Creadas ...';
@@ -407,6 +416,9 @@ PRINT 'Definiendo Constraints  Claves Primarias,  Check,  Unique ...';
 	
 	ALTER TABLE Recaptchat.ITEM_FACTURA ADD CONSTRAINT CK_item_monto CHECK (item_monto>= 0);
 
+--18
+	--Recaptchat.RESERVA_X_CLIENTE NO TIENE PK
+
 PRINT 'Definiendo Constraints  Claves Foraneas ...';
 
 --01
@@ -452,7 +464,7 @@ PRINT 'Definiendo Constraints  Claves Foraneas ...';
    -- Recaptchat.REGIMEN_ESTADIA NO TIENE FK
 
 -- 13
-	ALTER TABLE Recaptchat.RESERVA ADD CONSTRAINT FK_rese_clie_codigo FOREIGN KEY (rese_clie_codigo) REFERENCES Recaptchat.CLIENTE(clie_codigo);
+--	ALTER TABLE Recaptchat.RESERVA ADD CONSTRAINT FK_rese_clie_codigo FOREIGN KEY (rese_clie_codigo) REFERENCES Recaptchat.CLIENTE(clie_codigo);
 	ALTER TABLE Recaptchat.RESERVA ADD CONSTRAINT FK_rese_habi_codigo FOREIGN KEY (rese_habi_codigo) REFERENCES Recaptchat.HABITACION(habi_codigo);
 	ALTER TABLE Recaptchat.RESERVA ADD CONSTRAINT FK_rese_regi_codigo FOREIGN KEY (rese_regi_codigo) REFERENCES Recaptchat.REGIMEN_ESTADIA(regi_codigo);
 
@@ -469,8 +481,14 @@ PRINT 'Definiendo Constraints  Claves Foraneas ...';
 	ALTER TABLE Recaptchat.ITEM_FACTURA ADD CONSTRAINT FK_item_fact_numero FOREIGN KEY (item_fact_numero) REFERENCES Recaptchat.FACTURA(fact_numero);
 	ALTER TABLE Recaptchat.ITEM_FACTURA ADD CONSTRAINT FK_item_cons_codigo FOREIGN KEY (item_cons_codigo) REFERENCES Recaptchat.CONSUMIBLES(cons_codigo);
 
+--18
+	ALTER TABLE Recaptchat.RESERVA_X_CLIENTE ADD CONSTRAINT FK_resxcl_cliente FOREIGN KEY (fxr_resxcl_cliente) REFERENCES Recaptchat.CLIENTE(clie_codigo);
+	ALTER TABLE Recaptchat.RESERVA_X_CLIENTE ADD CONSTRAINT FK_resxcl_reserva FOREIGN KEY (resxcl_reserva) REFERENCES Recaptchat.RESERVA(rese_codigo);
+
 
 PRINT 'Constraints Definidas ...';
+-- ESTO DE ABAJO SOLO SE USA POR SI SE NECESITA REALIZAR UN TRUNCATE
+-- EJECUTAN ESTA SECCION DESCOMENTANDOLA, LUEGO LOS TRUNCATES Y LUEGO EJECUTEN DE NUEVO LOS CONSTRAINS
 
 PRINT 'Eliminar Constrains ...';
 	ALTER TABLE Recaptchat.ROL_X_USUARIO DROP CONSTRAINT FK_rxu_usua_codigo
@@ -483,13 +501,15 @@ PRINT 'Eliminar Constrains ...';
 		ALTER TABLE Recaptchat.HABITACION DROP CONSTRAINT FK_habi_hote_codigo
 		ALTER TABLE Recaptchat.HABITACION DROP CONSTRAINT FK_habi_tipo
 		ALTER TABLE Recaptchat.CLIENTE DROP CONSTRAINT FK_clie_acomp_codigo
-		ALTER TABLE Recaptchat.RESERVA DROP CONSTRAINT FK_rese_clie_codigo
+--		ALTER TABLE Recaptchat.RESERVA DROP CONSTRAINT FK_rese_clie_codigo
 		ALTER TABLE Recaptchat.RESERVA DROP CONSTRAINT FK_rese_habi_codigo
 		ALTER TABLE Recaptchat.RESERVA DROP CONSTRAINT FK_rese_regi_codigo
 		ALTER TABLE Recaptchat.ESTADIA DROP CONSTRAINT FK_esta_rese_codigo
 		ALTER TABLE Recaptchat.FACTURA DROP CONSTRAINT FK_fact_clie_codigo
 		ALTER TABLE Recaptchat.ITEM_FACTURA DROP CONSTRAINT FK_item_fact_numero
 		ALTER TABLE Recaptchat.ITEM_FACTURA DROP CONSTRAINT FK_item_cons_codigo
+		ALTER TABLE Recaptchat.RESERVA_X_CLIENTE DROP CONSTRAINT FK_resxcl_cliente
+		ALTER TABLE Recaptchat.RESERVA_X_CLIENTE DROP CONSTRAINT FK_resxcl_reserva
 PRINT 'Constrains Eliminadas ...';
 
 PRINT 'Truncate todas las tablas ...';
@@ -510,6 +530,7 @@ Truncate table Recaptchat.RESERVA
 Truncate table Recaptchat.ESTADIA
 Truncate table Recaptchat.FACTURA
 Truncate table Recaptchat.ESTADIA
+Truncate table Recaptchat.RESERVA_X_CLIENTE
 PRINT 'Tablas Trunqueadas ...';
 
 
@@ -727,44 +748,8 @@ SELECT * FROM Recaptchat.RESERVA
 									H.hote_dir_numero = M.Hotel_Nro_Calle
 
 
-/* CON SELECTS Y SUBSELECTS A LO INDIO */
-Select 
-	(Select Distinct M.Reserva_Codigo, C.clie_codigo,
-			hab.habi_hote_codigo as Habitacion_reservada,
-			H.hote_tipo_regimen,	
-			M.Reserva_Fecha_Inicio as rese_fecha_desde, 
-			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches as rese_fecha_hasta, 
-			M.Reserva_Cant_Noches as rese_cant_noches
-			from Recaptchat.HABITACION hab, gd_esquema.Maestra M, Recaptchat.CLIENTE C, Recaptchat.HOTEL H
-			where C.clie_doc_numero = M.Cliente_Pasaporte_Nro AND
-					H.hote_tipo_regimen = M.Regimen_Descripcion AND
-					H.hote_codigo = hab.habi_hote_codigo)
 
-	/*		C.clie_codigo,
-			hab.habi_hote_codigo as Habitacion_reservada,
-			H.hote_tipo_regimen,	
-			M.Reserva_Fecha_Inicio as rese_fecha_desde, 
-			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches as rese_fecha_hasta, 
-			M.Reserva_Cant_Noches as rese_cant_noches
-			*/
-	 From gd_esquema.Maestra M, Recaptchat.CLIENTE C, Recaptchat.HOTEL H
-
-update Recaptchat.RESERVA 
-set rese_clie_codigo = (Select Distinct clie_codigo from Recaptchat.CLIENTE)
-
-SELECT HA.habi_Codigo FROM gd_esquema.Maestra M1 JOIN Recaptchat.HOTEL H1
-	ON M1.Hotel_Calle = H1.hote_dir_calle 
-	AND M1.Hotel_Nro_Calle = H1.hote_dir_numero
-	JOIN Recaptchat.HABITACION HA ON HA.habi_numero = M1.Habitacion_Numero
-		WHERE HA.habi_hote_codigo = H1.hote_codigo
-
-Select Distinct hab.habi_codigo, hab.habi_numero from Recaptchat.HOTEL H
-	join gd_esquema.Maestra M ON H.hote_ciudad = M.Hotel_Ciudad AND 
-									H.hote_dir_calle = M.Hotel_Calle AND 
-									H.hote_dir_numero = M.Hotel_Nro_Calle
-								-- AND H.hote_tipo_regimen = M.Regimen_Descripcion
-	join Recaptchat.HABITACION hab on H.hote_codigo = hab.habi_hote_codigo
-order by hab.habi_codigo
+	
 
 --14 Carga de Tabla "ESTADIA"
 	
