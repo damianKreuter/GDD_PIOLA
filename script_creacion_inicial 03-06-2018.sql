@@ -122,7 +122,6 @@ PRINT 'Eliminando Tablas ...';
 
 PRINT 'Tablas Eliminadas ...';
 
-
 /* ****************************************************************************
 * SECCION_3 : CREACIÓN DE LAS TABLAS 
 **************************************************************************** */
@@ -592,14 +591,16 @@ PRINT 'Cargando las Tablas ...';
 	INSERT INTO GDD_404.REGIMEN_ESTADIA
 	     (regi_descripcion, regi_precio_base)
 		 
-		 (SELECT Regimen_Descripcion, Regimen_Precio FROM gd_esquema.Maestra)
+		 (SELECT Distinct Regimen_Descripcion, Regimen_Precio FROM gd_esquema.Maestra)
 
-
+		drop table GDD_404.REGIMEN_ESTADIA
 		 
 		 /*************HASTA AQUI FUNCIONA PERFECTAMENTE***********************/
 
 
 ----------------------------------------------------------------------------------------------
+
+Select * from GDD_404.REGIMEN_ESTADIA
 
 
 --13 Carga de Tabla "RESERVA"
@@ -607,16 +608,116 @@ PRINT 'Cargando las Tablas ...';
 	INSERT INTO GDD_404.RESERVA
 	(rese_codigo,rese_clie_codigo, rese_habi_codigo, rese_regi_codigo, rese_fecha_desde, rese_fecha_hasta, rese_cant_noches)
 
-	(SELECT DISTINCT M1.Reserva_Codigo, (SELECT DISTINCT C1.clie_codigo FROM GDD_404.CLIENTE C1 WHERE C1.clie_doc_numero = M1.Cliente_Pasaporte_Nro),
-	                        	(SELECT DISTINCT HB.habi_codigo FROM GDD_404.HABITACION HB JOIN GDD_404.HOTEL HT ON HB.habi_hote_codigo = HT.hote_codigo
-							                                                               JOIN gd_esquema.Maestra M2 ON HT.hote_dir_calle = M2.Cliente_Dom_calle AND 
-								                                                                                         HT.hote_dir_numero = M2.Hotel_Nro_Calle
-							     WHERE M2.Cliente_Dom_calle  = M1.Cliente_Dom_calle AND 
-								       M2.Hotel_Nro_Calle = M1.Hotel_Nro_Calle),
-							    (SELECT DISTINCT R1.regi_codigo FROM GDD_404.REGIMEN_ESTADIA R1 WHERE R1.regi_descripcion = M1.Regimen_Descripcion),
+	(
+	SELECT DISTINCT M1.Reserva_Codigo, 
+			(SELECT DISTINCT C1.clie_codigo FROM GDD_404.CLIENTE C1 WHERE C1.clie_doc_numero = M1.Cliente_Pasaporte_Nro),
+	        (SELECT DISTINCT HB.habi_codigo FROM GDD_404.HABITACION HB 
+					JOIN GDD_404.HOTEL HT ON HB.habi_hote_codigo = HT.hote_codigo
+		--			JOIN gd_esquema.Maestra M2 ON HT.hote_dir_calle = M2.Cliente_Dom_calle AND -- Aquí puede ser un problema del JOIN
+					JOIN gd_esquema.Maestra M2 ON HT.hote_dir_calle = M2.Hotel_Calle AND 
+						HT.hote_dir_numero = M2.Hotel_Nro_Calle
+					WHERE M2.Cliente_Dom_calle  = M1.Cliente_Dom_calle AND 
+						M2.Hotel_Nro_Calle = M1.Hotel_Nro_Calle),
+			(SELECT DISTINCT R1.regi_codigo FROM GDD_404.REGIMEN_ESTADIA R1 
+					WHERE R1.regi_descripcion = M1.Regimen_Descripcion),
 									             
-			                    M1.Reserva_Fecha_Inicio, M1.Reserva_Fecha_Inicio + M1.Reserva_Cant_Noches, M1.Reserva_Cant_Noches  FROM gd_esquema.Maestra M1)
+		M1.Reserva_Fecha_Inicio, M1.Reserva_Fecha_Inicio + M1.Reserva_Cant_Noches, M1.Reserva_Cant_Noches  
+								FROM gd_esquema.Maestra M1
+								)
 
+
+--EXTRA INICIO -----------------------------------------------------------------------
+SELECT DISTINCT C1.clie_codigo  as rese_clie_codigo
+ FROM GDD_404.CLIENTE C1
+	JOIN  gd_esquema.Maestra M1 on C1.clie_doc_numero = M1.Cliente_Pasaporte_Nro
+order by C1.clie_codigo asc
+
+
+SELECT DISTINCT HT.hote_codigo, HB.habi_codigo FROM GDD_404.HABITACION HB 
+					JOIN GDD_404.HOTEL HT ON HB.habi_hote_codigo = HT.hote_codigo
+		--			JOIN gd_esquema.Maestra M2 ON HT.hote_dir_calle = M2.Cliente_Dom_calle AND -- Aquí puede ser un problema del JOIN
+					JOIN gd_esquema.Maestra M1 ON
+												HT.hote_dir_calle = M1.Hotel_Calle AND 
+												HT.hote_dir_numero = M1.Hotel_Nro_Calle AND
+												HT.hote_ciudad = M1.Hotel_Ciudad
+
+order by HB.habi_codigo desc
+
+SELECT * FROM GDD_404.HOTEL HT 
+	JOIN gd_esquema.Maestra M1 ON 
+							HT.hote_dir_calle = M1.Hotel_Calle AND 
+							HT.hote_dir_numero = M1.Hotel_Nro_Calle AND 
+							HT.hote_ciudad = M1.Hotel_Ciudad
+
+SELECT DISTINCT M1.Reserva_Codigo,
+
+--			C1.clie_codigo as rese_clie_codigo,
+			
+			HT.hote_codigo as HOTEL_CODIGO,
+	--		HB.habi_codigo  as rese_habi_codigo,
+
+			R.regi_codigo as rese_regi_codigo,
+
+		M1.Reserva_Fecha_Inicio, M1.Reserva_Fecha_Inicio + M1.Reserva_Cant_Noches as rese_fecha_hasta, M1.Reserva_Cant_Noches  
+FROM GDD_404.HOTEL HT
+	JOIN gd_esquema.Maestra M1 ON 
+							HT.hote_dir_calle = M1.Hotel_Calle AND 
+							HT.hote_dir_numero = M1.Hotel_Nro_Calle AND 
+							HT.hote_ciudad = M1.Hotel_Ciudad
+--	JOIN GDD_404.CLIENTE C1 on C1.clie_doc_numero = M1.Cliente_Pasaporte_Nro
+--	JOIN GDD_404.HABITACION HB ON HB.habi_hote_codigo = HT.hote_codigo
+	JOIN GDD_404.REGIMEN_ESTADIA R ON R.regi_codigo = M1.Regimen_Descripcion 
+order by M1.Reserva_Codigo desc
+
+SELECT DISTINCT M1.Reserva_Codigo,
+
+			C1.clie_codigo as rese_clie_codigo,
+			
+			/*
+			(SELECT DISTINCT C1.clie_codigo FROM GDD_404.CLIENTE C1 WHERE C1.clie_doc_numero = M1.Cliente_Pasaporte_Nro) 
+			as rese_clie_codigo,
+	      
+			*/
+			HB.habi_codigo  as rese_habi_codigo,
+			/*
+		    (SELECT DISTINCT HB.habi_codigo FROM GDD_404.HABITACION HB 
+					JOIN GDD_404.HOTEL HT ON  AND
+		--			JOIN gd_esquema.Maestra M2 ON HT.hote_dir_calle = M2.Cliente_Dom_calle AND -- Aquí puede ser un problema del JOIN
+												HT.hote_dir_calle = M1.Hotel_Calle AND 
+												HT.hote_dir_numero = M1.Hotel_Nro_Calle )  as rese_habi_codigo,
+	*/
+	/*				JOIN gd_esquema.Maestra M2 ON HT.hote_dir_calle = M2.Hotel_Calle AND 
+						HT.hote_dir_numero = M2.Hotel_Nro_Calle
+					
+					WHERE M2.Cliente_Dom_calle  = M1.Cliente_Dom_calle AND 
+						M2.Hotel_Nro_Calle = M1.Hotel_Nro_Calle),
+	*/
+			R.regi_codigo as rese_regi_codigo,
+			/*
+--			(SELECT DISTINCT R1.regi_codigo FROM GDD_404.REGIMEN_ESTADIA R1 
+--					WHERE R1.regi_descripcion = M1.Regimen_Descripcion),
+*/									             
+		M1.Reserva_Fecha_Inicio, M1.Reserva_Fecha_Inicio + M1.Reserva_Cant_Noches as Datos_reserva, M1.Reserva_Cant_Noches  
+FROM GDD_404.HOTEL HT 
+	JOIN gd_esquema.Maestra M1 ON 
+							HT.hote_dir_calle = M1.Hotel_Calle AND 
+							HT.hote_dir_numero = M1.Hotel_Nro_Calle AND 
+							HT.hote_ciudad = M1.Hotel_Ciudad
+	JOIN GDD_404.CLIENTE C1 on C1.clie_doc_numero = M1.Cliente_Pasaporte_Nro
+	
+	JOIN GDD_404.HABITACION HB ON HB.habi_hote_codigo = HT.hote_codigo
+	
+	/*
+	JOIN GDD_404.HOTEL HT ON HT.hote_dir_calle = M1.Hotel_Calle AND 
+						 HT.hote_dir_numero = M1.Hotel_Nro_Calle
+						 */
+--	JOIN GDD_404.HABITACION HB ON HB.habi_hote_codigo = HT.hote_codigo
+
+	JOIN GDD_404.REGIMEN_ESTADIA R ON R.regi_descripcion = M1.Regimen_Descripcion 
+order by M1.Reserva_Codigo desc
+
+--FIN EXTRA------------------------------------------------------------------------------- 
+								
 
 --14 Carga de Tabla "ESTADIA"
 	
