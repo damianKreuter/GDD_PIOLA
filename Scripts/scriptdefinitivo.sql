@@ -698,22 +698,56 @@ SELECT * FROM Recaptchat.RESERVA
 										AND HT.hote_dir_calle = M.Hotel_Calle AND 
 						HT.hote_dir_numero = M.Hotel_Nro_Calle),
 	*/
+	Select Distinct M.Reserva_Codigo  From gd_esquema.Maestra M
+	order by M.Reserva_Codigo desc
+
+	-- RESERVA_X_CLIENTE
+
 	Select Distinct M.Reserva_Codigo, 
---		C.clie_codigo,
+		C.clie_codigo
+	 From gd_esquema.Maestra M
+		JOIN Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro
+	Order by M.Reserva_Codigo desc
+
+
+	Select Distinct M.Reserva_Codigo, 
+--			C.clie_codigo,
 			hab.habi_hote_codigo as Habitacion_reservada,
 			H.hote_tipo_regimen,	
 			M.Reserva_Fecha_Inicio as rese_fecha_desde, 
 			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches as rese_fecha_hasta, 
 			M.Reserva_Cant_Noches as rese_cant_noches
 	 From gd_esquema.Maestra M
-		Join Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro
+--		Join Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro
 		join Recaptchat.HOTEL H ON H.hote_tipo_regimen = M.Regimen_Descripcion
 		join Recaptchat.HABITACION hab on H.hote_codigo = hab.habi_hote_codigo
-	--	join Recaptchat.HABITACION_TIPO HT on HT.habi_tipo = hab.habi_tipo 
-	/*	 Where H.hote_ciudad = M.Hotel_Ciudad AND 
+--		join Recaptchat.HABITACION_TIPO HT on HT.habi_tipo = hab.habi_tipo 
+		 Where H.hote_ciudad = M.Hotel_Ciudad AND 
 									H.hote_dir_calle = M.Hotel_Calle AND 
 									H.hote_dir_numero = M.Hotel_Nro_Calle
-*/
+
+
+/* CON SELECTS Y SUBSELECTS A LO INDIO */
+Select 
+	(Select Distinct M.Reserva_Codigo, C.clie_codigo,
+			hab.habi_hote_codigo as Habitacion_reservada,
+			H.hote_tipo_regimen,	
+			M.Reserva_Fecha_Inicio as rese_fecha_desde, 
+			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches as rese_fecha_hasta, 
+			M.Reserva_Cant_Noches as rese_cant_noches
+			from Recaptchat.HABITACION hab, gd_esquema.Maestra M, Recaptchat.CLIENTE C, Recaptchat.HOTEL H
+			where C.clie_doc_numero = M.Cliente_Pasaporte_Nro AND
+					H.hote_tipo_regimen = M.Regimen_Descripcion AND
+					H.hote_codigo = hab.habi_hote_codigo)
+
+	/*		C.clie_codigo,
+			hab.habi_hote_codigo as Habitacion_reservada,
+			H.hote_tipo_regimen,	
+			M.Reserva_Fecha_Inicio as rese_fecha_desde, 
+			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches as rese_fecha_hasta, 
+			M.Reserva_Cant_Noches as rese_cant_noches
+			*/
+	 From gd_esquema.Maestra M, Recaptchat.CLIENTE C, Recaptchat.HOTEL H
 
 update Recaptchat.RESERVA 
 set rese_clie_codigo = (Select Distinct clie_codigo from Recaptchat.CLIENTE)
