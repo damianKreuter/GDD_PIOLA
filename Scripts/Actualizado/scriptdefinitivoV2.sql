@@ -46,7 +46,7 @@ IF (NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'R
 
 PRINT 'Esquema Creado ...';
 /* ****************************************************************************
-* SECCION_2 : ELIMINACIÓN DE TABLAS
+* SECCION_2 : ELIMINACIÓN DE TABLAS PREVIAS
 **************************************************************************** */
 
 PRINT 'Eliminando Tablas ...';
@@ -150,6 +150,7 @@ PRINT 'Creando Tablas ...';
 	usua_dir_nro			NUMERIC(18,0),
 	usua_fecha_nacimiento	DATETIME
 	);
+PRINT 'Tabla USUARIOS creada ...';
 
 --02
 	CREATE TABLE Recaptchat.ROL (
@@ -157,24 +158,28 @@ PRINT 'Creando Tablas ...';
 	rol_nombre				NVARCHAR(255)		  NOT NULL,
 	rol_estado_activo		BIT
     );
+PRINT 'Tabla ROL creada ...';
 
 --03
 	CREATE TABLE Recaptchat.ROL_X_USUARIO (
 	rxu_usua_codigo			INT NOT NULL,       -- [FK] Ref a USUARIO.usua_codigo
 	rxu_rol_codigo			TINYINT NOT NULL,	-- [FK] Ref a ROL.rol_codigo'
     );
+PRINT 'Tabla ROL_X_USUARIO creada ...';
 
 --04
     CREATE TABLE Recaptchat.FUNCIONALIDAD (
 	func_codigo				INT IDENTITY(1,1) NOT NULL, -- [PK]
 	func_nombre				NVARCHAR(225)
 	);
+PRINT 'Tabla FUNCIONALIDAD creada ...';
 
 --05
 	CREATE TABLE Recaptchat.FUNCIONALIDAD_X_ROL (
 	fxr_rol_codigo			TINYINT NOT NULL,  -- [FK] Ref a ROL.rol_codigo
 	fxr_func_codigo			INT NOT NULL,      -- [FK] Ref a FUNCIONALIDAD.func_codigo
 	);
+PRINT 'Tabla FUNCIONALIDAD_X_ROL creada ...';
 
 --06
 	CREATE TABLE Recaptchat.HOTEL (
@@ -187,17 +192,20 @@ PRINT 'Creando Tablas ...';
 	hote_cant_estrellas		NUMERIC(18,0),----
 	hote_ciudad				NVARCHAR(255),----
 	hote_pais				NVARCHAR(50),
-	hote_tipo_regimen		NVARCHAR(255),
+	hote_tipo_regimen		INT NOT NULL, -- [FK] Ref a REGIMEN_ESTADIA.regi_codigo
+--	hote_tipo_regimen		NVARCHAR(255),
 	hote_fecha_creacion		DATETIME,
 	hote_recarga_estrellas	NUMERIC(18,0),----
 	hote_estado_activo		BIT 
 	);
+PRINT 'Tabla HOTEL creada ...';
 
 --07
 	CREATE TABLE Recaptchat.HOTEL_X_USUARIO (
 	hxu_hote_codigo			INT NOT NULL, -- [FK] Ref a HOTEL.hote_codigo
 	hxu_usua_codigo			INT NOT NULL, -- [FK] Ref a USUARIO.usua_codigo
 	);
+PRINT 'Tabla HOTEL_X_USUARIO creada ...';
 
 --08
 	CREATE TABLE Recaptchat.ESTADO_HOTEL (
@@ -206,8 +214,8 @@ PRINT 'Creando Tablas ...';
 	esho_fecha_inicio		DATETIME,
 	esho_fecha_fin			DATETIME,
 	esho_motivo				NVARCHAR(255),
-
 	);
+PRINT 'Tabla ESTADO_HOTEL creada ...';
 
 --09
 	CREATE TABLE Recaptchat.HABITACION_TIPO (
@@ -215,6 +223,7 @@ PRINT 'Creando Tablas ...';
 	habi_descripcion        NVARCHAR(255),----
 	habi_porcentual         NUMERIC(18,0),----
 	);
+PRINT 'Tabla HABITACION_TIPO creada ...';
 
 --10
 	CREATE TABLE Recaptchat.HABITACION (
@@ -225,8 +234,9 @@ PRINT 'Creando Tablas ...';
 	habi_ubicacion_frente   NVARCHAR(50),----
 	habi_tipo               NUMERIC(18,0),---- [FK] Ref a HABITACION_TIPO.habi_tipo
 	habi_estado_activo      BIT,
-	
 	);
+PRINT 'Tabla HABITACION creada ...';
+
 
 --11
    	CREATE TABLE Recaptchat.CLIENTE (
@@ -248,7 +258,8 @@ PRINT 'Creando Tablas ...';
 	clie_nacionalidad      NVARCHAR(255),----
 	clie_estado_activo     BIT
 	);
-	
+PRINT 'Tabla CLIENTE creada ...';
+
 --12
 	CREATE TABLE Recaptchat.REGIMEN_ESTADIA (
 	regi_codigo            INT IDENTITY(1,1) NOT NULL, --[PK]         
@@ -256,6 +267,7 @@ PRINT 'Creando Tablas ...';
 	regi_precio_base       NUMERIC(18,0),----
 	regi_estado_activo     BIT,
 	);
+PRINT 'Tabla REGIMEN_ESTADIA creada ...';
 
 --13
 	CREATE TABLE Recaptchat.RESERVA (
@@ -271,12 +283,14 @@ PRINT 'Creando Tablas ...';
 	rese_fecha_cancelacion  DATETIME,
 	rese_motivo_cancelacion NVARCHAR(255)
 	);
+PRINT 'Tabla RESERVA creada ...';
 
 --14
 	CREATE TABLE Recaptchat.RESERVA_X_CLIENTE (
-	resxcl_cliente			INT, --[FK] Ref a CLIENTE.clie_codigo
-	resxcl_reserva			INT, --[FK] Ref a RESERVA.rese_codigo
+	resxcl_cliente			INT NOT NULL, --[FK] Ref a CLIENTE.clie_codigo
+	resxcl_reserva			NUMERIC(18,0) NOT NULL, --[FK] Ref a RESERVA.rese_codigo
 	);
+PRINT 'Tabla RESERVA_X_CLIENTE creada ...';
 
 --15
 	CREATE TABLE Recaptchat.ESTADIA (
@@ -286,6 +300,7 @@ PRINT 'Creando Tablas ...';
 	esta_forma_pago                 NVARCHAR(255),
 	esta_forma_pago_descripcion     NVARCHAR(255),
 	);
+PRINT 'Tabla ESTADIA creada ...';
 
 --16
 	CREATE TABLE Recaptchat.CONSUMIBLES (
@@ -293,6 +308,7 @@ PRINT 'Creando Tablas ...';
 	cons_descripcion       NVARCHAR(255),----
 	cons_precio            NUMERIC(18,0),----
 	); 
+PRINT 'Tabla CONSUMIBLES creada ...';
 
 --17
 	CREATE TABLE Recaptchat.FACTURA (
@@ -301,6 +317,7 @@ PRINT 'Creando Tablas ...';
 	fact_fecha             DATETIME,--
 	fact_total             NUMERIC(18,0),----
 	);
+PRINT 'Tabla FACTURA creada ...';
 
 --18
 	CREATE TABLE Recaptchat.ITEM_FACTURA (
@@ -310,7 +327,7 @@ PRINT 'Creando Tablas ...';
 	item_descripcion	   NVARCHAR(255),
 	item_monto             NUMERIC(18,0)
 	);
-
+PRINT 'Tabla ITEM_FACTURA creada ...';
 
 PRINT 'Tablas Creadas ...';
 
@@ -443,7 +460,8 @@ PRINT 'Definiendo Constraints  Claves Foraneas ...';
 	ALTER TABLE Recaptchat.FUNCIONALIDAD_X_ROL ADD CONSTRAINT FK_fxr_func_codigo FOREIGN KEY (fxr_func_codigo) REFERENCES Recaptchat.FUNCIONALIDAD(func_codigo);
 
 --06
-	-- GDD_404.HOTEL NO TIENE FK
+	ALTER TABLE Recaptchat.HOTEL ADD CONSTRAINT FK_hote_tipo_regimen FOREIGN KEY (hote_tipo_regimen) REFERENCES Recaptchat.REGIMEN_ESTADIA(regi_codigo);
+
 
 --07
 	ALTER TABLE Recaptchat.HOTEL_X_USUARIO ADD CONSTRAINT FK_hxu_hote_codigo FOREIGN KEY (hxu_hote_codigo) REFERENCES Recaptchat.HOTEL(hote_codigo);
@@ -474,7 +492,8 @@ PRINT 'Definiendo Constraints  Claves Foraneas ...';
 	ALTER TABLE Recaptchat.ESTADIA ADD CONSTRAINT FK_esta_rese_codigo  FOREIGN KEY (esta_rese_codigo) REFERENCES Recaptchat.RESERVA(rese_codigo);
 
 --15
-	ALTER TABLE Recaptchat.RESERVA_X_CLIENTE ADD CONSTRAINT FK_resxcl_cliente FOREIGN KEY (fxr_resxcl_cliente) REFERENCES Recaptchat.CLIENTE(clie_codigo);
+---------------------------------------------------------------------------------------------------------------------
+	ALTER TABLE Recaptchat.RESERVA_X_CLIENTE ADD CONSTRAINT FK_resxcl_cliente FOREIGN KEY (resxcl_cliente) REFERENCES Recaptchat.CLIENTE(clie_codigo);
 	ALTER TABLE Recaptchat.RESERVA_X_CLIENTE ADD CONSTRAINT FK_resxcl_reserva FOREIGN KEY (resxcl_reserva) REFERENCES Recaptchat.RESERVA(rese_codigo);
 
 --16
@@ -487,11 +506,13 @@ PRINT 'Definiendo Constraints  Claves Foraneas ...';
 	ALTER TABLE Recaptchat.ITEM_FACTURA ADD CONSTRAINT FK_item_fact_numero FOREIGN KEY (item_fact_numero) REFERENCES Recaptchat.FACTURA(fact_numero);
 	ALTER TABLE Recaptchat.ITEM_FACTURA ADD CONSTRAINT FK_item_cons_codigo FOREIGN KEY (item_cons_codigo) REFERENCES Recaptchat.CONSUMIBLES(cons_codigo);
 
-
-
 PRINT 'Constraints Definidas ...';
+
+
 -- ESTO DE ABAJO SOLO SE USA POR SI SE NECESITA REALIZAR UN TRUNCATE
--- EJECUTAN ESTA SECCION DESCOMENTANDOLA, LUEGO LOS TRUNCATES Y LUEGO EJECUTEN DE NUEVO LOS CONSTRAINS
+-- EJECUTAN ESTA SECCION DESCOMENTANDOLA PARA QUITAR LOS CONSTRAINTS
+-- LUEGO LOS TRUNCATES Y LUEGO EJECUTEN DE NUEVO LOS CONSTRAINS
+
 
 PRINT 'Eliminar Constrains ...';
 		ALTER TABLE Recaptchat.ROL_X_USUARIO DROP CONSTRAINT FK_rxu_usua_codigo
@@ -501,7 +522,7 @@ PRINT 'Eliminar Constrains ...';
 		ALTER TABLE Recaptchat.HOTEL_X_USUARIO DROP CONSTRAINT FK_hxu_hote_codigo
 		ALTER TABLE Recaptchat.HOTEL_X_USUARIO DROP CONSTRAINT FK_hxu_usua_codigo
 		ALTER TABLE Recaptchat.ESTADO_HOTEL DROP CONSTRAINT FK_esho_hote_codigo
-		ALTER TABLE Recaptchat.HABITACION DROP CONSTRAINT FK_habi_hote_codigo
+				ALTER TABLE Recaptchat.HABITACION DROP CONSTRAINT FK_habi_hote_codigo
 		ALTER TABLE Recaptchat.HABITACION DROP CONSTRAINT FK_habi_tipo
 		ALTER TABLE Recaptchat.CLIENTE DROP CONSTRAINT FK_clie_acomp_codigo
 		ALTER TABLE Recaptchat.RESERVA DROP CONSTRAINT FK_rese_clie_codigo
@@ -513,6 +534,7 @@ PRINT 'Eliminar Constrains ...';
 		ALTER TABLE Recaptchat.ITEM_FACTURA DROP CONSTRAINT FK_item_cons_codigo
 		ALTER TABLE Recaptchat.RESERVA_X_CLIENTE DROP CONSTRAINT FK_resxcl_cliente
 		ALTER TABLE Recaptchat.RESERVA_X_CLIENTE DROP CONSTRAINT FK_resxcl_reserva
+
 PRINT 'Constrains Eliminadas ...';
 
 PRINT 'Truncate todas las tablas ...';
@@ -533,9 +555,37 @@ Truncate table Recaptchat.RESERVA
 Truncate table Recaptchat.ESTADIA
 Truncate table Recaptchat.FACTURA
 Truncate table Recaptchat.ESTADIA
-Truncate table Recaptchat.RESERVA_X_CLIENTE
+Truncate table Recaptchat.RESERVA_X_CLIENTE	
+
 PRINT 'Tablas Trunqueadas ...';
 
+/* ****************************************************************************
+Comprobación de cargas de tablas
+***************************************************************************** */
+
+select * from Recaptchat.CLIENTE
+
+select * from Recaptchat.CONSUMIBLES
+select * from Recaptchat.ESTADIA
+select * from Recaptchat.ESTADO_HOTEL
+select * from Recaptchat.FACTURA
+select * from Recaptchat.FUNCIONALIDAD
+select * from Recaptchat.FUNCIONALIDAD_X_ROL
+select * from Recaptchat.HABITACION
+select * from Recaptchat.HABITACION_TIPO
+
+
+select * from Recaptchat.HOTEL h
+
+
+select * from Recaptchat.HOTEL_X_USUARIO
+select * from Recaptchat.ITEM_FACTURA
+select * from Recaptchat.REGIMEN_ESTADIA
+select * from Recaptchat.RESERVA
+select * from Recaptchat.RESERVA_X_CLIENTE
+select * from Recaptchat.ROL
+select * from Recaptchat.ROL_X_USUARIO
+select * from Recaptchat.USUARIO
 
 /* ****************************************************************************
 * SECCION_5 : MIGRACION DE DATOS DE TABLA MAESTRA
@@ -545,6 +595,7 @@ PRINT 'Cargando las Tablas ...';
 
 --(01) Carga de Tabla "ROL"
 
+PRINT 'Insetando valores para ROL'
 	INSERT INTO Recaptchat.ROL 
 		(rol_nombre)
 	VALUES
@@ -553,10 +604,9 @@ PRINT 'Cargando las Tablas ...';
 		('GUEST')
 
 
-	--	Select * from Recaptchat.ROL 
-
 --(02) Carga de Tabla "FUNCIONALIDAD"
 
+PRINT 'Insetando valores para ROL'
 	INSERT INTO Recaptchat.FUNCIONALIDAD 
 		(func_nombre)
 	VALUES 
@@ -564,22 +614,19 @@ PRINT 'Cargando las Tablas ...';
 		('Empleado'),
 		('Huesped')
 
---	Select * from Recaptchat.FUNCIONALIDAD
 	
-
-		
 --(03) Carga de Tabla "FUNCIONALIDAD_X_ROL"
 
+PRINT 'Insetando valores para FUNCIONALIDAD_X_ROL'
 	INSERT INTO Recaptchat.FUNCIONALIDAD_X_ROL (fxr_rol_codigo, fxr_func_codigo)
 	VALUES 
 		((SELECT rol_codigo FROM  Recaptchat.Rol  WHERE rol_nombre = 'ADMINISTRADOR'), (SELECT func_codigo FROM Recaptchat.Funcionalidad WHERE func_nombre = 'Administrar')),
 		((SELECT rol_codigo FROM  Recaptchat.Rol  WHERE rol_nombre = 'RECEPCIONISTA'), (SELECT func_codigo FROM Recaptchat.Funcionalidad WHERE func_nombre = 'Empleado')),
 		((SELECT rol_codigo FROM  Recaptchat.Rol  WHERE rol_nombre = 'GUEST'), (SELECT func_codigo FROM Recaptchat.Funcionalidad WHERE func_nombre = 'Huesped'))	
 
---	Select * from Recaptchat.FUNCIONALIDAD_X_ROL
-
 --(04) Carga de Tabla "USUARIO"
 
+PRINT 'Insetando valores para USUARIO'
 	INSERT INTO Recaptchat.USUARIO 
 		(usua_username,usua_password, usua_fecha_creacion,usua_nombre,usua_apellido, usua_mail) 
 	VALUES 
@@ -589,10 +636,10 @@ PRINT 'Cargando las Tablas ...';
 		('ariel',HASHBYTES('SHA2_256','ariel'), GETDATE(),'Ariel','','ejemplo4@gmail.com'),
 		('jose',HASHBYTES('SHA2_256','jose'), GETDATE(),'José','Quispealaya','ejemplo5@gmail.com')
 
---	Select * from Recaptchat.USUARIO  
 
 --(05) Carga de Tabla "ROL_X_USUARIO"
 
+PRINT 'Insetando valores para ROL_X_USUARIO'
 	INSERT INTO Recaptchat.ROL_X_USUARIO 
 		(rxu_usua_codigo, rxu_rol_codigo) 
     VALUES
@@ -602,19 +649,28 @@ PRINT 'Cargando las Tablas ...';
 		((SELECT usua_codigo FROM  Recaptchat.USUARIO WHERE  usua_codigo = 4 ), (SELECT rol_codigo FROM Recaptchat.ROL WHERE rol_codigo = 3)),
 		((SELECT usua_codigo FROM  Recaptchat.USUARIO WHERE  usua_codigo = 5 ), (SELECT rol_codigo FROM Recaptchat.ROL WHERE rol_codigo = 3))
 
-Select * from Recaptchat.ROL_X_USUARIO 
+--(06) Carga de Tabla "REGIMEN_ESTADIA"
 
---(06) Carga de Tabla "HOTEL"
+PRINT 'Insetando valores para REGIMEN_ESTADIA'
+	INSERT INTO Recaptchat.REGIMEN_ESTADIA
+	     (regi_descripcion, regi_precio_base)
+		 
+		 (SELECT Distinct Regimen_Descripcion, Regimen_Precio FROM gd_esquema.Maestra)
 
+
+--(07) Carga de Tabla "HOTEL"
+
+PRINT 'Insetando valores para HOTEL'
 	INSERT INTO Recaptchat.HOTEL
 		(hote_ciudad,hote_dir_calle, hote_dir_numero, hote_cant_estrellas, hote_tipo_regimen,  hote_recarga_estrellas)
 
-	(SELECT distinct Hotel_Ciudad, Hotel_Calle, Hotel_Nro_Calle, Hotel_CantEstrella, Regimen_Descripcion, Hotel_Recarga_Estrella FROM  gd_esquema.Maestra)
-
-Select hote_ciudad, hote_dir_calle, hote_dir_numero, hote_tipo_regimen from Recaptchat.HOTEL
-order by hote_dir_numero desc
+	(SELECT distinct g.Hotel_Ciudad, g.Hotel_Calle, g.Hotel_Nro_Calle, g.Hotel_CantEstrella, r.regi_codigo, g.Hotel_Recarga_Estrella 
+		FROM  gd_esquema.Maestra g
+			JOIN Recaptchat.REGIMEN_ESTADIA r ON r.regi_descripcion = g.Regimen_Descripcion)
 	
---(07) Carga de Tabla "HOTEL_X_USUARIO"
+--(08) Carga de Tabla "HOTEL_X_USUARIO"
+
+PRINT 'Insetando valores para HOTEL_X_USUARIO'
 	INSERT INTO Recaptchat.HOTEL_X_USUARIO
 		(hxu_hote_codigo, hxu_usua_codigo)
 	VALUES
@@ -633,29 +689,27 @@ order by hote_dir_numero desc
 		((SELECT hote_codigo FROM  Recaptchat.HOTEL WHERE hote_codigo = 13),(SELECT usua_codigo FROM Recaptchat.USUARIO WHERE usua_codigo = 5)),
 		((SELECT hote_codigo FROM  Recaptchat.HOTEL WHERE hote_codigo = 14),(SELECT usua_codigo FROM Recaptchat.USUARIO WHERE usua_codigo = 5)),
 		((SELECT hote_codigo FROM  Recaptchat.HOTEL WHERE hote_codigo = 15),(SELECT usua_codigo FROM Recaptchat.USUARIO WHERE usua_codigo = 5))
-	
-	select * from Recaptchat.HOTEL_X_USUARIO
 
---(08) Carga de Tabla "ESTADO_HOTEL"
 
+--(09) Carga de Tabla "ESTADO_HOTEL"
+
+PRINT 'Insetando valores para ESTADO_HOTEL'
 	INSERT INTO Recaptchat.ESTADO_HOTEL
 		(esho_hote_codigo)
 
 	(SELECT hote_codigo FROM Recaptchat.HOTEL)
-
-	select * from Recaptchat.ESTADO_HOTEL
 	
---(09) Carga de Tabla "HABITACION_TIPO"
+--(10) Carga de Tabla "HABITACION_TIPO"
 
+PRINT 'Insetando valores para HABITACION_TIPO'
 	INSERT INTO Recaptchat.HABITACION_TIPO
 		(habi_tipo, habi_descripcion, habi_porcentual)
 
 	(SELECT DISTINCT Habitacion_Tipo_Codigo, Habitacion_Tipo_Descripcion, Habitacion_Tipo_Porcentual FROM gd_esquema.Maestra)  
 
-	Select * from Recaptchat.HABITACION_TIPO
+--(11) Carga de Tabla "HABITACION"
 
---(10) Carga de Tabla "HABITACION"
-
+PRINT 'Insetando valores para HABITACION'
 	INSERT INTO Recaptchat.HABITACION
 		(habi_hote_codigo, habi_tipo, habi_numero, habi_piso, habi_ubicacion_frente)
 	   (Select Distinct HT.hote_codigo, M1.Habitacion_Tipo_Codigo, M1.Habitacion_Numero, M1.Habitacion_Piso, Habitacion_Frente
@@ -667,33 +721,21 @@ order by hote_dir_numero desc
 	     WHERE HT.hote_dir_calle = M1.Hotel_Calle AND HT.hote_dir_numero = M1.Hotel_Nro_Calle ),
 	     M1.Habitacion_Tipo_Codigo, M1.Habitacion_Numero, M1.Habitacion_Piso, Habitacion_Frente FROM gd_esquema.Maestra M1)
 */
-	
+select * from Recaptchat.HABITACION
+--(12) Carga de Tabla "CLIENTE"
 
-	Select * from Recaptchat.HABITACION
-
---(11) Carga de Tabla "CLIENTE"
-
+PRINT 'Insetando valores para CLIENTE'
 	INSERT INTO Recaptchat.CLIENTE
 		(clie_doc_numero,clie_doc_tipo, clie_nombre, clie_apellido, clie_fecha_nacimiento, clie_mail, clie_dir_nombre, clie_dir_numero, clie_dir_piso, clie_dir_dpto,clie_nacionalidad)
 
 		(SELECT DISTINCT Cliente_Pasaporte_Nro, 'Pasaporte', Cliente_Nombre, Cliente_Apellido, Cliente_Fecha_Nac, Cliente_Mail, Cliente_Dom_Calle, Cliente_Nro_Calle, Cliente_Piso, Cliente_Depto, Cliente_Nacionalidad FROM gd_esquema.Maestra )
-
-select * from Recaptchat.CLIENTE
-
---(12) Carga de Tabla "REGIMEN_ESTADIA"
-
-	INSERT INTO Recaptchat.REGIMEN_ESTADIA
-	     (regi_descripcion, regi_precio_base)
-		 
-		 (SELECT Distinct Regimen_Descripcion, Regimen_Precio FROM gd_esquema.Maestra)
-
-	Select * from Recaptchat.REGIMEN_ESTADIA
 
 
 --(13) Carga de la Tabla "RESERVA"
 
 SELECT * FROM Recaptchat.RESERVA
 
+PRINT 'Insetando valores para RESERVA'
 	INSERT INTO Recaptchat.RESERVA
 	(rese_codigo, rese_habi_codigo, rese_regi_codigo, rese_fecha_desde, rese_fecha_hasta, rese_cant_noches)
 
@@ -705,23 +747,66 @@ SELECT * FROM Recaptchat.RESERVA
 			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches, 
 			M.Reserva_Cant_Noches
 	 From gd_esquema.Maestra M
-		join Recaptchat.HOTEL H ON H.hote_ciudad = M.Hotel_Ciudad AND 
-									H.hote_dir_calle = M.Hotel_Calle AND 
-									H.hote_dir_numero = M.Hotel_Nro_Calle
-		Join Recaptchat.REGIMEN_ESTADIA reg ON reg.regi_descripcion = H.hote_tipo_regimen 
+		join Recaptchat.HOTEL H ON H.hote_ciudad = M.Hotel_Ciudad 
+								AND H.hote_dir_calle = M.Hotel_Calle 
+								AND H.hote_dir_numero = M.Hotel_Nro_Calle
+		Join Recaptchat.REGIMEN_ESTADIA reg ON reg.regi_descripcion = M.Regimen_Descripcion
 		join Recaptchat.HABITACION hab on H.hote_codigo = hab.habi_hote_codigo
 		)
+		
+		Select Distinct M.Reserva_Codigo, 
+			h.hote_codigo,
+--			reg.regi_codigo,	
+			M.Reserva_Fecha_Inicio, 
+			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches, 
+			M.Reserva_Cant_Noches
+	 From gd_esquema.Maestra M
+		join Recaptchat.HOTEL H ON 
+	--							H.hote_ciudad = M.Hotel_Ciudad 
+	--							AND H.hote_dir_calle = M.Hotel_Calle AND
+								H.hote_dir_numero = M.Hotel_Nro_Calle
+		Join Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro 
+--								AND C.clie_mail = M.Cliente_Mail
+--		Join Recaptchat.REGIMEN_ESTADIA reg ON reg.regi_descripcion = M.Regimen_Descripcion and reg.regi_codigo = H.hote_tipo_regimen
+--		Join Recaptchat.HABITACION hab on hab.habi_hote_codigo = H.hote_codigo
+		order by M.Reserva_Codigo asc
 
+	Select Distinct M.Reserva_Codigo, 
+			h.hote_codigo,
+			reg.regi_codigo,	
+			M.Reserva_Fecha_Inicio, 
+			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches, 
+			M.Reserva_Cant_Noches
+
+	 From gd_esquema.Maestra M
+		join Recaptchat.HOTEL H ON 
+								 H.hote_dir_numero = M.Hotel_Nro_Calle
+		Join Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro
+		Join Recaptchat.REGIMEN_ESTADIA reg ON reg.regi_descripcion = M.Regimen_Descripcion
+			WHERE M.Estadia_Fecha_Inicio IS NULL
+order by M.Reserva_Codigo asc
 	/*				(SELECT DISTINCT HB.habi_codigo FROM Recaptchat.HABITACION HB 
 					JOIN Recaptchat.HOTEL HT ON 
 										HB.habi_hote_codigo = HT.hote_codigo 
 										AND HT.hote_dir_calle = M.Hotel_Calle AND 
 						HT.hote_dir_numero = M.Hotel_Nro_Calle),
 	*/
-	Select Distinct M.Reserva_Codigo  From gd_esquema.Maestra M
-	order by M.Reserva_Codigo desc
+
+
+	Select Distinct M.Reserva_Codigo 
+--			hab.habi_hote_codigo,
+--			reg.regi_codigo,	
+	 From gd_esquema.Maestra M
+--		join Recaptchat.HOTEL H ON H.hote_ciudad = M.Hotel_Ciudad 
+----								AND H.hote_dir_calle = M.Hotel_Calle 
+--								AND H.hote_dir_numero = M.Hotel_Nro_Calle
+--		Join Recaptchat.REGIMEN_ESTADIA reg ON reg.regi_descripcion = H.hote_tipo_regimen 
+--		join Recaptchat.HABITACION hab on H.hote_codigo = hab.habi_hote_codigo
+		join gd_esquema.Maestra M2 on M2.Reserva_Codigo = M.Reserva_Codigo
 
 --(14) Carga de la Tabla "RESERVA_X_CLIENTE"
+
+PRINT 'Insetando valores para RESERVA_X_CLIENTE'
 	INSERT INTO Recaptchat.RESERVA_X_CLIENTE
 	Select Distinct M.Reserva_Codigo, 
 		C.clie_codigo
@@ -730,25 +815,21 @@ SELECT * FROM Recaptchat.RESERVA
 	Order by M.Reserva_Codigo desc
 
 	Select Distinct M.Reserva_Codigo, 
---			C.clie_codigo,
-			hab.habi_hote_codigo as Habitacion_reservada,
-			H.hote_tipo_regimen,	
-			M.Reserva_Fecha_Inicio as rese_fecha_desde, 
-			M.Reserva_Fecha_Inicio + M.Reserva_Cant_Noches as rese_fecha_hasta, 
-			M.Reserva_Cant_Noches as rese_cant_noches
+			C.clie_codigo
 	 From gd_esquema.Maestra M
---		Join Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro
-		join Recaptchat.HOTEL H ON H.hote_tipo_regimen = M.Regimen_Descripcion
-		join Recaptchat.HABITACION hab on H.hote_codigo = hab.habi_hote_codigo
+		Join Recaptchat.CLIENTE C on C.clie_doc_numero = M.Cliente_Pasaporte_Nro
+		order by M.Reserva_Codigo
+--		join Recaptchat.HOTEL H ON H.hote_tipo_regimen = M.Regimen_Descripcion
+--		join Recaptchat.HABITACION hab on H.hote_codigo = hab.habi_hote_codigo
 --		join Recaptchat.HABITACION_TIPO HT on HT.habi_tipo = hab.habi_tipo 
-		 Where H.hote_ciudad = M.Hotel_Ciudad AND 
-									H.hote_dir_calle = M.Hotel_Calle AND 
-									H.hote_dir_numero = M.Hotel_Nro_Calle
-
+--		 Where H.hote_ciudad = M.Hotel_Ciudad AND 
+--									H.hote_dir_calle = M.Hotel_Calle AND 
+--									H.hote_dir_numero = M.Hotel_Nro_Calle
 
 
 --(15) Carga de Tabla "ESTADIA"
 	
+PRINT 'Insetando valores para ESTADIA'
 	INSERT INTO Recaptchat.ESTADIA
 	( esta_rese_codigo, esta_fecha_inicio, esta_cant_noches)
 	SELECT R.rese_codigo, 
@@ -756,9 +837,9 @@ SELECT * FROM Recaptchat.RESERVA
 	 R.rese_cant_noches FROM Recaptchat.RESERVA R
 
 
-
 --(16) Carga de Tabla "FACTURA"
-	
+
+PRINT 'Insetando valores para FACTURA'	
 	INSERT INTO Recaptchat.FACTURA
 	   (fact_numero, fact_clie_codigo, fact_fecha, fact_total)
 	SELECT DISTINCT  
@@ -774,10 +855,10 @@ SELECT * FROM Recaptchat.RESERVA
 			M2.Factura_Nro = M1.Factura_Nro
 			AND M1.Factura_Nro IS NOT NULL
 			AND M2.Factura_Nro IS NOT NULL
- 
 
 --(17) Carga de Tabla "CONSUMIBLES"  
-	
+
+PRINT 'Insetando valores para CONSUMIBLES'	
 	INSERT INTO Recaptchat.CONSUMIBLES
 		(cons_codigo, cons_descripcion, cons_precio)
 	SELECT DISTINCT 
@@ -790,6 +871,8 @@ SELECT * FROM Recaptchat.RESERVA
 					AND M2.Consumible_Codigo IS NOT NULL   
 					          
 --(18) Carga de Tabla "ITEM_FACTURA"
+
+PRINT 'Insetando valores para ITEM_FACTURA'
 	INSERT INTO Recaptchat.ITEM_FACTURA
 		(item_fact_numero, item_cons_codigo, item_descripcion, item_monto) -- , FALTA LA CANTIDAD DE CONSUMIBLES  "item_cons_cantidad"
 	SELECT DISTINCT 
@@ -798,5 +881,4 @@ SELECT * FROM Recaptchat.RESERVA
 					 C.cons_descripcion,
 					 C.cons_precio
 					 FROM Recaptchat.FACTURA F, Recaptchat.CONSUMIBLES C
-
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
