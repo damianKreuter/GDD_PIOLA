@@ -789,6 +789,7 @@ AND g.Habitacion_Numero = h.Habitacion_Numero
 AND g.Habitacion_Piso = h.Habitacion_Piso
 ORDER BY 1
 
+select * from RIP.Estadias_Habitaciones
 
 PRINT''
 PRINT '----- Realizando inserts tabla Huespedes -----'
