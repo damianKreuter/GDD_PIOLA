@@ -816,6 +816,7 @@ AND g.Habitacion_Piso = h.Habitacion_Piso
 WHERE Factura_Nro IS NOT NULL
 ORDER BY 1
 
+select * from RIP.Consumidos
 
 PRINT''
 PRINT '----- Realizando inserts tabla Facturas -----'
